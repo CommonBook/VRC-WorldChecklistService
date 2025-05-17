@@ -5,6 +5,9 @@ from vrchatapi.exceptions import UnauthorizedException
 from vrchatapi.models.two_factor_auth_code import TwoFactorAuthCode
 from vrchatapi.models.two_factor_email_code import TwoFactorEmailCode
 
+# For optomizing API calls, having this here for safekeeping is much better.
+userID = ""
+
 def apiLogin(api_client, configuration):
 
     # Step 2. VRChat consists of several API's (WorldsApi, UsersApi, FilesApi, NotificationsApi, FriendsApi, etc...)
@@ -33,6 +36,7 @@ def apiLogin(api_client, configuration):
         print("Exception when calling API: %s\n", e)
 
     print("Logged in as:", current_user.display_name)
+    return current_user.id
 
 def apiLogout(api_client):
     # Instantiate instances of API classes
@@ -40,12 +44,12 @@ def apiLogout(api_client):
     
     auth_api.logout()
 
+# This is no longer used because I grew a brain and realized it doubled the number of API calls.
+# I'll leave it here for fun though.
 def get_current_user_ID(api_client):
     # Instantiate instances of API classes
     auth_api = authentication_api.AuthenticationApi(api_client)
-
     user = auth_api.get_current_user()
-    
     id = user.id
 
     return id

@@ -28,9 +28,9 @@ def get_user_location(api_client, userID : str):
 
 def _on_exit(api_client, dataStruct : worldID_Data):
     print("\nSigning out...")
-    #login.apiLogout(api_client)
+    login.apiLogout(api_client)
     print("Exporting data...")
-    #dataStruct.export()
+    dataStruct.export()
     '''try:
         dataStruct.export()
     except:
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         api_client.user_agent = "WorldChecklistService/0.0.1 jcmart701@gmail.com"
         allData = worldID_Data()
 
-        #login.apiLogin(api_client, configuration)
+        curUserID = login.apiLogin(api_client, configuration)
         atexit.register(_on_exit, api_client, allData)
 
         curLocation = ""
@@ -62,22 +62,28 @@ if __name__ == "__main__":
             
             match mode.lower()[0]:
                 case "1":
+                    
+                    allData.load()
+
                     print("!- To end the service, enter CTRL+C")
                     print("!- Disclaimer: The default interval for checks is 3 minutes. This is because the VRChat API has an enforced " \
                     "rate limit. Exceeding this limit will cause the service to crash. If you wish to override this limit, enter a number here. Otherwise, " \
                     "leave the field empty to continue with the default value\n")
+                    
                     timeSetting = input("Enter time (seconds) or press enter: ")
                     timeoutLimit = int(timeSetting) if timeSetting != "" and timeSetting.isdigit() else (60*3)
 
                     while True:
                         try:
-                            new_location = get_user_location(api_client, login.get_current_user_ID(api_client))
+                            new_location = get_user_location(api_client, curUserID)
                             if new_location != curLocation:
                                 curLocation = new_location
                                 print(f"\nPlayer moved to {curLocation}!\n")
                                 
                                 if curLocation in allData.data.keys() and allData.data[curLocation]["visited"] == True:
                                     print("But that location has already been documented.")
+                                    time.sleep(timeoutLimit)
+                                    continue
                                 else:
                                     print("Saving data...")
 
@@ -85,12 +91,14 @@ if __name__ == "__main__":
                                 newLocationInfo.update({"visited": True})
 
                                 allData.data.update({curLocation: newLocationInfo})
+                                time.sleep(timeoutLimit)
 
                             else:
                                 print("Player did not move worlds.")
-                            break
+                                time.sleep(timeoutLimit)
 
                         except KeyboardInterrupt:
+                            print(" Stopped world watcher service")
                             break
                         
                         except:
@@ -103,6 +111,7 @@ if __name__ == "__main__":
                         
                         try:
                             print("!- This feature not implemented")
+                            break
 
                         except KeyboardInterrupt:
                             break
