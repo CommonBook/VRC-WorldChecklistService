@@ -1,5 +1,6 @@
 # VRC-WorldChecklistService
 A rudimentary Python script to keep track of worlds you visit in VRChat.
+Currenly WIP. Not in a usable state.
 
 - Has options for scraping un-visited worlds.
 - Runs in the background while you play to automatically log the worlds you visit
